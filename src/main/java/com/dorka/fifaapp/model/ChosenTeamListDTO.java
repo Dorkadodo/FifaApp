@@ -1,17 +1,10 @@
 package com.dorka.fifaapp.model;
 
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ChosenTeamListDTO {
     private String[] teams;
-
-    public ChosenTeamListDTO() {
-    }
-
-    public String[] getTeams() {
-        return teams;
-    }
-
-    public void setTeams(String[] teams) {
-        this.teams = teams;
-    }
 }

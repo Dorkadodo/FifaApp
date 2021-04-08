@@ -7,10 +7,10 @@
 <body>
 <form action="/choose-teams" method="post">
     <label for="user">The name of the owner:</label>
-    <input id="user" name="user">
+    <input id="user" name="user" type="text">
     <button type="submit">Save teams</button>
     <table>
-        <tr th:each="team : ${teamList}" th:object="${choosenTeams}">
+        <tr th:each="team : ${teamList}" th:object="${chosenTeams}">
             <td><label for="name" th:text="${team}"/></td>
             <td><input type="checkbox" th:value="${team}" th:field="*{teams}"></td>
         </tr>
