@@ -1,10 +1,19 @@
 package com.dorka.fifaapp.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 public class MatchKey implements Serializable {
 
@@ -14,36 +23,19 @@ public class MatchKey implements Serializable {
     @Column(name = "AWAYTEAM_ID")
     private Long awayteamId;
 
-    public MatchKey() {
-    }
-
-    public Long getHometeamId() {
-        return hometeamId;
-    }
-
-    public void setHometeamId(Long hometeamId) {
-        this.hometeamId = hometeamId;
-    }
-
-    public Long getAwayteamId() {
-        return awayteamId;
-    }
-
-    public void setAwayteamId(Long awayteamId) {
-        this.awayteamId = awayteamId;
-    }
+    @Column(name = "ROUND_NUMBER")
+    private Long roundNumber;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MatchKey)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         MatchKey matchKey = (MatchKey) o;
-        return getHometeamId().equals(matchKey.getHometeamId()) &&
-                getAwayteamId().equals(matchKey.getAwayteamId());
+        return hometeamId.equals(matchKey.hometeamId) && awayteamId.equals(matchKey.awayteamId) && roundNumber.equals(matchKey.roundNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getHometeamId(), getAwayteamId());
+        return Objects.hash(hometeamId, awayteamId, roundNumber);
     }
 }

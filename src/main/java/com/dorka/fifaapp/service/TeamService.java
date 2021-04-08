@@ -97,4 +97,8 @@ public class TeamService {
                 .collect(Collectors.toList());
     }
 
+    public List<Team> getAllTeams() {
+        return (List<Team>)teamRepository.findAll();
+    }
+
 }

@@ -28,7 +28,7 @@ public class PlayerController {
         if (newNameError != null) {
             model.addAttribute("newNameError", "newNameError");
         }
-        model.addAttribute("playerList", playerService.getAllPlayerName());
+        model.addAttribute("playerList", playerService.getAllPlayerNames());
         return "playersPage";
     }
 
