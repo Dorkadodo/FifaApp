@@ -1,48 +1,43 @@
 package com.dorka.fifaapp.controller;
 
-import com.dorka.fifaapp.exception.MyFileNotFoundException;
+import com.dorka.fifaapp.exception.PlayerNameException;
 import com.dorka.fifaapp.model.ChosenTeamListDTO;
 import com.dorka.fifaapp.service.TeamService;
+import com.dorka.fifaapp.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class TeamController {
 
     private TeamService teamService;
+    private PlayerService playerService;
 
     @Autowired
-    public TeamController(TeamService teamService) {
+    public TeamController(TeamService teamService, PlayerService playerService) {
         this.teamService = teamService;
+        this.playerService = playerService;
     }
 
-    @GetMapping ("/")
-    public String showAllTeams(Model model) throws MyFileNotFoundException {
+    @GetMapping ("/fifa/team")
+    public String showAllTeams(Model model) {
         model.addAttribute("teamList", teamService.getAvailableNationalTeams());
         model.addAttribute("chosenTeams", new ChosenTeamListDTO());
-        return "index";
+        model.addAttribute("playerList", playerService.getPlayersWithTeamCount());
+        return "teamsPage";
     }
 
-//    @GetMapping("/load-new-nations")
-//    public String loadNewNations() throws MyFileNotFoundException {
-//        teamService.loadAllNationNames();
-//        return "redirect:/";
-//    }
-
-    @PostMapping("/choose-teams")
-    public String something(@ModelAttribute ChosenTeamListDTO teams, @RequestParam String user){
-        teamService.chooseTeams(teams.getTeams(), user);
-        return "redirect:/";
+    @PostMapping("/fifa/team")
+    public String something(@ModelAttribute ChosenTeamListDTO teams, @RequestParam String player) throws PlayerNameException {
+        teamService.addTeamsToPlayer(teams.getTeams(), playerService.getPlayerByName(player));
+        return "redirect:/fifa/team";
     }
 
-//    @GetMapping("/{id}")
-//    public String changeName (@PathVariable Long id, @RequestParam String name){
-//        mainService.changeName(id, name);
-//        return "redirect:/";
-//    }
+    @PutMapping("/fifa/team/{id}")
+    public String changeName (@PathVariable Long id, @RequestParam String name){
+        teamService.changeName(id, name);
+        return "redirect:/fifa/team";
+    }
 }

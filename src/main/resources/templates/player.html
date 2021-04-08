@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fifa Championship</title>
+</head>
+<body>
+<div th:replace="fragments :: header"/>
+<div th:replace="fragments :: navBar"/>
+
+
+    <h2 th:text="${playerName}"/>
+    <table>
+        <th>Teams:</th>
+        <tr th:each="team : ${teamList}">
+            <td th:text="${team}"/>
+        </tr>
+    </table>
+
+
+</body>
+</html>

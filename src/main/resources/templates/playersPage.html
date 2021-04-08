@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fifa Championship</title>
+</head>
+<body>
+<div th:replace="fragments :: header"/>
+<div th:replace="fragments :: navBar"/>
+
+<form action="/fifa/player/create" method="post">
+    <h2>Add a new player</h2>
+    <p th:if="${newNameError}" style="color: red">This player already exists! Choose another name.</p>
+    <label for="newName">Name:</label>
+    <input id="newName" name="newName" type="text">
+    <button type="submit">Save</button>
+</form>
+
+<section id="PlayerList">
+    <h2>List of Players:</h2>
+    <table>
+        <tr th:each="playerName : ${playerList}">
+            <td><a th:href="'/fifa/player/' + ${playerName}" th:text="${playerName}"/> </td>
+            <td><a th:href="'/fifa/player/delete/' + ${playerName}">DELETE</a></td>
+        </tr>
+    </table>
+</section>
+
+<!--<aside>-->
+<!--    <h2>Check player</h2>-->
+<!--    <table>-->
+<!--        <tr th:each="player : ${userList}">-->
+
+<!--        </tr>-->
+<!--    </table>-->
+<!--</aside>-->
+
+
+</body>
+</html>

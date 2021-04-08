@@ -4,19 +4,20 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class User {
+public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+//    @Column(unique = true)
     private String name;
 
     @OneToMany (mappedBy = "owner")
     private List<Team> ownTeams;
 
-    public User() {
+    public Player() {
     }
 
-    public User(String name){
+    public Player(String name){
         this.name = name;
     }
 

@@ -1,10 +1,11 @@
 package com.dorka.fifaapp.service;
 
 import com.dorka.fifaapp.exception.MyFileNotFoundException;
+import com.dorka.fifaapp.exception.PlayerNameException;
 import com.dorka.fifaapp.model.Team;
-import com.dorka.fifaapp.model.User;
+import com.dorka.fifaapp.model.Player;
 import com.dorka.fifaapp.repo.TeamRepository;
-import com.dorka.fifaapp.repo.UserRepository;
+import com.dorka.fifaapp.repo.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,13 +22,11 @@ import java.util.stream.Collectors;
 public class TeamService {
 
     private TeamRepository teamRepository;
-    private UserRepository userRepository;
     private List<String> teamNames;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, UserRepository userRepository) {
+    public TeamService(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
-        this.userRepository = userRepository;
         try {
             teamNames = loadAllNationNames();
         } catch (MyFileNotFoundException e) {
@@ -43,7 +41,7 @@ public class TeamService {
         return teamNames;
     }
 
-    public List<String> getAvailableNationalTeams() throws MyFileNotFoundException {
+    public List<String> getAvailableNationalTeams() {
         List<String> alreadyChosenTeamList = getAlreadyChosenTeamList();
         return getAvailableTeamNames(alreadyChosenTeamList);
     }
@@ -59,7 +57,7 @@ public class TeamService {
     }
 
     private List<String> getAlreadyChosenTeamList() {
-        List<String> alreadyChosenTeamList = ((List<Team>)teamRepository.findAll()).stream()
+        List<String> alreadyChosenTeamList = ((List<Team>) teamRepository.findAll()).stream()
                 .map(team -> team.getName())
                 .collect(Collectors.toList());
         return alreadyChosenTeamList;
@@ -85,22 +83,18 @@ public class TeamService {
         }
     }
 
-
-
-    public void chooseTeams(String[] teams, String userName){
-        addTeamsToUser(teams, userName);
-    }
-
-    private void addTeamsToUser(String[] teams, String userName) {
-        User user = userRepository.findByName(userName);
-        if (user == null){
-            user = userRepository.save(new User(userName));
-        }
-        for (String teamName: teams) {
+    public void addTeamsToPlayer(String[] teams, Player player) {
+        for (String teamName : teams) {
             if (!teamName.equals("")) {
-                teamRepository.save(new Team(teamName, user));
+                teamRepository.save(new Team(teamName, player));
             }
         }
+    }
+
+    public List<String> getTeamsByPlayer(Player player) {
+        return teamRepository.findByOwner(player).stream()
+                .map(Team::getName)
+                .collect(Collectors.toList());
     }
 
 }

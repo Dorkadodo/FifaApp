@@ -11,7 +11,7 @@ public class Team {
     private String name;
     @ManyToOne
     @JoinColumn(name = "OWNER_ID")
-    private User owner;
+    private Player owner;
 
     @OneToMany(mappedBy = "awayteamId")
     private List<Match> hometeamMatches;
@@ -24,7 +24,7 @@ public class Team {
         awayteamMatches = null;
     }
 
-    public Team(String name, User owner) {
+    public Team(String name, Player owner) {
         this.owner = owner;
         this.name = name;
     }
@@ -46,11 +46,11 @@ public class Team {
         this.name = name;
     }
 
-    public User getOwner() {
+    public Player getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(Player owner) {
         this.owner = owner;
     }
     //endregion

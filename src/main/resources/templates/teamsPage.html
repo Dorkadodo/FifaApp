@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fifa Championship</title>
+</head>
+<body>
+<div th:replace="fragments :: header"/>
+<div th:replace="fragments :: navBar"/>
+
+<form action="/fifa/team" method="post">
+    <h2>Choose new teams:</h2>
+    <label for="player">Player name:</label>
+    <select id="player" name="player">
+        <option th:each="player : ${playerList}" th:text="${player.playerName}"/>
+    </select>
+    <button type="submit">Save teams</button>
+    <table>
+        <tr th:each="team : ${teamList}" th:object="${chosenTeams}">
+            <td><label for="name" th:text="${team}"/></td>
+            <td><input type="checkbox" th:value="${team}" th:field="*{teams}"></td>
+        </tr>
+    </table>
+</form>
+
+<aside>
+    <h2>Check player</h2>
+    <table>
+        <tr th:each="player : ${playerList}">
+            <td th:text="${player.playerName}"/>
+            <td th:text="${player.teamCount}"/>
+        </tr>
+    </table>
+</aside>
+
+
+</body>
+</html>
