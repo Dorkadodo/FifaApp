@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ChampionshipController {
@@ -15,6 +16,14 @@ public class ChampionshipController {
     @Autowired
     public ChampionshipController(ChampionshipService championshipService) {
         this.championshipService = championshipService;
+    }
+
+    @GetMapping("/fifa/championship")
+    public String championship(@RequestParam(required = false) String invalidNumberError, Model model) {
+        if (invalidNumberError != null) {
+            model.addAttribute("invalidNumberError", invalidNumberError);
+        }
+        return "championshipPage";
     }
 
     @GetMapping("/fifa/championship/draw")

@@ -26,7 +26,7 @@ public class PlayerController {
     public String playersPage(@RequestParam(required = false) String newNameError, Model model) {
         model.addAttribute("playerRequest", new PlayerRequestDTO());
         if (newNameError != null) {
-            model.addAttribute("newNameError", "newNameError");
+            model.addAttribute("newNameError", newNameError);
         }
         model.addAttribute("playerList", playerService.getAllPlayerNames());
         return "playersPage";

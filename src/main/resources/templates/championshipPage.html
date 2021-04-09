@@ -8,7 +8,10 @@
 <div th:replace="fragments :: header"/>
 <div th:replace="fragments :: navBar"/>
 
-<section id="drawResult">
+<p th:if="${invalidNumberError}" style="color: red">This number of teams can't be used. It should be power of two (eg. 16, 32, 63...)</p>
+<a href="/fifa/championship/draw">NEW DRAW</a>
+
+<section th:if="${matchList}" id="drawResult">
     <h2>Result of draw:</h2>
     <table>
         <tr th:each="match : ${matchList}">

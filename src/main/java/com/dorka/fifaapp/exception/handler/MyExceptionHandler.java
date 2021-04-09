@@ -1,5 +1,6 @@
 package com.dorka.fifaapp.exception.handler;
 
+import com.dorka.fifaapp.exception.InvalidNumberOfTeamsException;
 import com.dorka.fifaapp.exception.PlayerAlreadyExistsException;
 import com.dorka.fifaapp.exception.PlayerNameException;
 import org.springframework.ui.Model;
@@ -26,4 +27,9 @@ public class MyExceptionHandler {
         return "error";
     }
 
+    @ExceptionHandler(InvalidNumberOfTeamsException.class)
+    public String invalidNumberOfTeamsExceptionHandler() {
+        logger.log(Level.WARNING, "InvalidNumberOfTeamsException");
+        return "redirect:/fifa/championship?invalidNumberError=true";
+    }
 }

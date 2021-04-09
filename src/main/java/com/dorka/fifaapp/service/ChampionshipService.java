@@ -1,10 +1,8 @@
 package com.dorka.fifaapp.service;
 
 import com.dorka.fifaapp.exception.InvalidNumberOfTeamsException;
-import com.dorka.fifaapp.model.Match;
-import com.dorka.fifaapp.model.MatchKey;
-import com.dorka.fifaapp.model.Player;
-import com.dorka.fifaapp.model.Team;
+import com.dorka.fifaapp.model.*;
+import com.dorka.fifaapp.repo.ChampionshipDataRepository;
 import com.dorka.fifaapp.repo.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,23 +15,49 @@ public class ChampionshipService {
     private TeamService teamService;
     private PlayerService playerService;
     private MatchRepository matchRepository;
+    private ChampionshipDataRepository championshipDataRepository;
 
     @Autowired
-    public ChampionshipService(TeamService teamService, PlayerService playerService, MatchRepository matchRepository) {
+    public ChampionshipService(
+            TeamService teamService, PlayerService playerService,
+            MatchRepository matchRepository, ChampionshipDataRepository championshipDataRepository) {
         this.teamService = teamService;
         this.playerService = playerService;
         this.matchRepository = matchRepository;
+        this.championshipDataRepository = championshipDataRepository;
     }
 
     public List<Match> draw() throws InvalidNumberOfTeamsException {
         List<Team> teams = teamService.getAllTeams();
         checkIfPowerOfTwo(teams.size());
-        Integer round = 1;
+        Integer round = getNewRoundForDraw();
         createDraw(round);
         return matchRepository.findMatchesById_RoundNumber(round);
     }
 
     //region DrawPrivateMethods
+    private Integer getNewRoundForDraw() {
+        Optional<ChampionshipData> optionalRound = championshipDataRepository.findById(ChampionshipDataType.ROUND);
+        if (optionalRound.isPresent()) {
+            return getRoundPlusOne(optionalRound.get());
+        } else {
+            return getFirstRound();
+        }
+    }
+
+    private Integer getFirstRound() {
+        Integer round = 1;
+        championshipDataRepository.save(new ChampionshipData(ChampionshipDataType.ROUND, round.toString()));
+        return round;
+    }
+
+    private Integer getRoundPlusOne(ChampionshipData roundData) {
+        Integer round = Integer.parseInt(roundData.getValue()) + 1;
+        roundData.setValue(round.toString());
+        championshipDataRepository.save(roundData);
+        return round;
+    }
+
     private void createDraw(Integer round) {
         List<Player> players = playerService.getAllPlayers();
         HashMap<Player, List<Team>> awayTeamMap = getTeamsInMap(players);
