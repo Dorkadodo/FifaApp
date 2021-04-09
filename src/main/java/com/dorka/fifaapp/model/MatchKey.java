@@ -17,25 +17,25 @@ import java.util.Objects;
 @Embeddable
 public class MatchKey implements Serializable {
 
-    @Column(name = "HOMETEAM_ID")
-    private Long hometeamId;
+    @Column(name = "HOME_TEAM_ID")
+    private Long homeTeamId;
 
-    @Column(name = "AWAYTEAM_ID")
-    private Long awayteamId;
+    @Column(name = "AWAY_TEAM_ID")
+    private Long awayTeamId;
 
     @Column(name = "ROUND_NUMBER")
-    private Long roundNumber;
+    private Integer roundNumber;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MatchKey matchKey = (MatchKey) o;
-        return hometeamId.equals(matchKey.hometeamId) && awayteamId.equals(matchKey.awayteamId) && roundNumber.equals(matchKey.roundNumber);
+        return homeTeamId.equals(matchKey.homeTeamId) && awayTeamId.equals(matchKey.awayTeamId) && roundNumber.equals(matchKey.roundNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hometeamId, awayteamId, roundNumber);
+        return Objects.hash(homeTeamId, awayTeamId, roundNumber);
     }
 }

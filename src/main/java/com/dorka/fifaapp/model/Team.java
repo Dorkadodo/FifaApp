@@ -1,8 +1,16 @@
 package com.dorka.fifaapp.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
 @Entity
 public class Team {
     @Id
@@ -13,45 +21,19 @@ public class Team {
     @JoinColumn(name = "OWNER_ID")
     private Player owner;
 
-    @OneToMany(mappedBy = "awayteamId")
-    private List<Match> hometeamMatches;
+    @OneToMany(mappedBy = "awayTeam")
+    private List<Match> homeTeamMatches;
 
-    @OneToMany (mappedBy = "hometeamId")
-    private List<Match> awayteamMatches;
+    @OneToMany (mappedBy = "homeTeam")
+    private List<Match> awayTeamMatches;
 
     public Team() {
-        hometeamMatches = null;
-        awayteamMatches = null;
+        homeTeamMatches = null;
+        awayTeamMatches = null;
     }
 
     public Team(String name, Player owner) {
         this.owner = owner;
         this.name = name;
     }
-
-    //region GettersAndSetters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Player getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Player owner) {
-        this.owner = owner;
-    }
-    //endregion
 }

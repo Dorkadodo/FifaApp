@@ -4,5 +4,8 @@ import com.dorka.fifaapp.model.Match;
 import com.dorka.fifaapp.model.MatchKey;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface MatchRepository extends CrudRepository<Match, MatchKey> {
+    List<Match>findMatchesById_RoundNumber(Integer roundNumber);
 }
