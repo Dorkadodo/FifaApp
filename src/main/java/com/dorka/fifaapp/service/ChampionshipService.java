@@ -52,10 +52,65 @@ public class ChampionshipService {
     }
 
 
+//    public List<Match> redraw() {
+//    }
 
-    public void setResultOfMatch(int resultHomeTeam, int resultAwayTeam) {
-
+    public void setResultOfMatch(MatchResultDTO matchResult)
+            throws InvalidTeamNameException, NoChampionshipFoundException, MissingParameterException, MatchResultException {
+        checkMatchResultInput(matchResult);
+        ChampionshipData championshipData = getCurrentChampionshipData();
+        Match match = getMatch(matchResult, championshipData.getRound());
+        match.setHomeTeamScore(matchResult.getHometeamScore());
+        match.setAwayTeamScore(matchResult.getAwayteamScore());
+        setWinner(match, matchResult);
+        matchRepository.save(match);
+        finishRoundIfNeeded(championshipData);
     }
+
+    //region MatchResultPrivateMethods
+    private void finishRoundIfNeeded(ChampionshipData championshipData) {
+        if (checkIfRoundIsFinished(championshipData.getRound())) {
+            championshipData.setOngoingRound(false);
+            championshipDataRepository.save(championshipData);
+        }
+    }
+
+    private Boolean checkIfRoundIsFinished(Integer round) {
+        List<Match> currentMatchList = matchRepository.findMatchesById_RoundNumber(round);
+        Optional<Match> noWinnerYet = currentMatchList.stream()
+                .filter(match -> match.getWinner() == null)
+                .findAny();
+        return !noWinnerYet.isPresent();
+    }
+
+    private void checkMatchResultInput(MatchResultDTO matchResult) throws MissingParameterException, MatchResultException {
+        if (matchResult == null || matchResult.getHometeamScore() == null || matchResult.getHometeamName() == null
+                || matchResult.getAwayteamScore() == null || matchResult.getAwayteamName() == null) {
+            throw new MissingParameterException();
+        }
+        if (matchResult.getAwayteamScore().equals(matchResult.getAwayteamScore())
+                || matchResult.getAwayteamScore() < 0 || matchResult.getHometeamScore() < 0) {
+            throw new MatchResultException("The provided score is invalid");
+        }
+    }
+
+    private void setWinner(Match match, MatchResultDTO matchResult) {
+        if (matchResult.getAwayteamScore() < matchResult.getHometeamScore()) {
+            match.setWinner(match.getHomeTeam());
+        } else {
+            match.setWinner(match.getAwayTeam());
+        }
+    }
+
+    private Match getMatch(MatchResultDTO matchResult, Integer round)
+            throws InvalidTeamNameException, MatchResultException {
+        Team hometeam = teamService.getByName(matchResult.getHometeamName());
+        Team awayteam = teamService.getByName(matchResult.getAwayteamName());
+        return matchRepository.findById_HomeTeamIdAndId_AwayTeamIdAndId_RoundNumber(
+                hometeam.getId(), awayteam.getId(), round)
+                .orElseThrow(() -> new MatchResultException("No match found with the given parameters!"));
+    }
+    //endregion
 
     public Boolean isOngoingChampionship() {
         Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
@@ -76,6 +131,10 @@ public class ChampionshipService {
     public void startNewChampionship() {
         finishLastChampionship();
         championshipDataRepository.save(new ChampionshipData());
+    }
+
+    public List<Match> getCurrentMatches() throws NoChampionshipFoundException {
+        return matchRepository.findMatchesById_RoundNumber(getCurrentChampionshipData().getRound());
     }
 
     private void finishLastChampionship() {

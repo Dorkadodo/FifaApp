@@ -13,13 +13,31 @@
 <a th:unless="${ongoingRound}" href="/fifa/championship/ongoing-draw">START NEXT ROUND</a>
 <a th:if="${ongoingRound}" href="/fifa/championship/redraw">REDRAW CURRENT ROUND</a>
 
-<section th:if="${matchList}" id="drawResult">
-    <h2>Result of draw:</h2>
+<section th:if="${matchList}" id="matchResultList">
+    <h2>Matches:</h2>
     <table>
         <tr th:each="match : ${matchList}">
-            <td th:text="${match.homeTeam.name}"/>
-            <td> : </td>
-            <td th:text="${match.awayTeam.name}"/>
+            <form th:unless="${match.homeTeamScore}" action="/fifa/championship/match" method="post" th:object="${matchResult}">
+                <td th:text="${match.homeTeam.name}"/>
+                <input type="hidden" th:text="${match.homeTeam.name}" th:field="*{hometeamName}">
+                <td>
+                    <input type="number" th:field="*{hometeamScore}">
+                </td>
+                <td> : </td>
+                <td>
+                    <input type="number" th:field="*{awayteamScore}">
+                </td>
+                <td th:text="${match.awayTeam.name}"/>
+                <input type="hidden" th:text="${match.awayTeam.name}" th:field="*{awayteamName}">
+                <td><button type="submit"/>SUBMIT</td>
+            </form>
+            <div th:if="${match.homeTeamScore}">
+                <td th:text="${match.homeTeam.name}"/>
+                <td th:text="${match.homeTeamScore}"/>
+                <td> : </td>
+                <td th:text="${match.awayTeamScore}"/>
+                <td th:text="${match.awayTeam.name}"/>
+            </div>
         </tr>
     </table>
 </section>

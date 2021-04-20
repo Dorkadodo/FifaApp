@@ -1,5 +1,6 @@
 package com.dorka.fifaapp.service;
 
+import com.dorka.fifaapp.exception.InvalidTeamNameException;
 import com.dorka.fifaapp.exception.MyFileNotFoundException;
 import com.dorka.fifaapp.model.Team;
 import com.dorka.fifaapp.model.Player;
@@ -105,5 +106,9 @@ public class TeamService {
 
     public void deleteAllTeams() {
         teamRepository.deleteAll();
+    }
+
+    public Team getByName(String name) throws InvalidTeamNameException {
+        return teamRepository.findByName(name).orElseThrow(InvalidTeamNameException::new);
     }
 }

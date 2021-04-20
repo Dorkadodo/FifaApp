@@ -5,7 +5,10 @@ import com.dorka.fifaapp.model.Team;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TeamRepository extends CrudRepository<Team, Long> {
     List<Team> findByOwner(Player player);
+
+    Optional<Team> findByName(String name);
 }

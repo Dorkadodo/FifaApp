@@ -51,4 +51,11 @@ public class MyExceptionHandler {
         model.addAttribute("errorMessage", "Sorry, we couldn't find any player for the draw.");
         return "error";
     }
+
+    @ExceptionHandler(MatchResultException.class)
+    public String matchResultExceptionHandler(MatchResultException ex, Model model) {
+        logger.log(Level.WARNING, ex.getMessage());
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
 }
