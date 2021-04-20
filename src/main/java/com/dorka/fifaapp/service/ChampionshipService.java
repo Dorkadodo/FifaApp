@@ -1,6 +1,6 @@
 package com.dorka.fifaapp.service;
 
-import com.dorka.fifaapp.exception.InvalidNumberOfTeamsException;
+import com.dorka.fifaapp.exception.*;
 import com.dorka.fifaapp.model.*;
 import com.dorka.fifaapp.repo.ChampionshipDataRepository;
 import com.dorka.fifaapp.repo.MatchRepository;
@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class ChampionshipService {
@@ -16,6 +19,8 @@ public class ChampionshipService {
     private PlayerService playerService;
     private MatchRepository matchRepository;
     private ChampionshipDataRepository championshipDataRepository;
+
+    private static Logger logger = Logger.getLogger("ChampionshipService");
 
     @Autowired
     public ChampionshipService(
@@ -27,54 +32,104 @@ public class ChampionshipService {
         this.championshipDataRepository = championshipDataRepository;
     }
 
-    public List<Match> draw() throws InvalidNumberOfTeamsException {
+    public List<Match> drawOfNewChampionship()
+            throws InvalidNumberOfTeamsException, NoPlayerFoundException, NoChampionshipFoundException {
         List<Team> teams = teamService.getAllTeams();
         checkIfPowerOfTwo(teams.size());
-        Integer round = getNewRoundForDraw();
-        createDraw(round);
+        ChampionshipData championshipData = startFirstRound();
+        Integer round = championshipData.getRound();
+        createDraw(round, getNewTeamsInMap());
         return matchRepository.findMatchesById_RoundNumber(round);
     }
 
+    public List<Match> drawOfOngoingChampionship()
+            throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
+        ChampionshipData championshipData = getCurrentChampionshipData();
+        Integer round = getNewRoundForDraw(championshipData).getRound();
+        HashMap<Player, List<Team>> teams = getWinnersOfLastRound(championshipData);
+        createDraw(round, teams);
+        return matchRepository.findMatchesById_RoundNumber(round);
+    }
+
+
+
+    public void setResultOfMatch(int resultHomeTeam, int resultAwayTeam) {
+
+    }
+
+    public Boolean isOngoingChampionship() {
+        Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
+        if (optionalCSD.isPresent()) {
+            return optionalCSD.get().isOngoingChampionship();
+        }
+        return false;
+    }
+
+    public Boolean isOngoingRound() {
+        Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
+        if (optionalCSD.isPresent()) {
+            return optionalCSD.get().isOngoingChampionship() && optionalCSD.get().isOngoingRound();
+        }
+        return false;
+    }
+
+    public void startNewChampionship() {
+        finishLastChampionship();
+        championshipDataRepository.save(new ChampionshipData());
+    }
+
+    private void finishLastChampionship() {
+        try {
+            ChampionshipData lastChampionship = getCurrentChampionshipData();
+            lastChampionship.setOngoingChampionship(false);
+            championshipDataRepository.save(lastChampionship);
+        } catch (NoChampionshipFoundException e) {
+            logger.log(Level.INFO, "didn't find previous championship");
+        }
+        matchRepository.deleteAll();
+        teamService.deleteAllTeams();
+    }
+
+    private ChampionshipData getCurrentChampionshipData() throws NoChampionshipFoundException {
+        Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
+        return optionalCSD.orElseThrow(NoChampionshipFoundException::new);
+    }
+
     //region DrawPrivateMethods
-    private Integer getNewRoundForDraw() {
-        Optional<ChampionshipData> optionalRound = championshipDataRepository.findById(ChampionshipDataType.ROUND);
-        if (optionalRound.isPresent()) {
-            return getRoundPlusOne(optionalRound.get());
+    private ChampionshipData getNewRoundForDraw(ChampionshipData championshipData) throws UnfinishedRoundException {
+        if (championshipData.isOngoingRound()) {
+            throw new UnfinishedRoundException();
         } else {
-            return getFirstRound();
+            Integer round = championshipData.getRound() + 1;
+            championshipData.setRound(round);
+            championshipData.setOngoingRound(true);
+            return championshipDataRepository.save(championshipData);
         }
     }
 
-    private Integer getFirstRound() {
-        Integer round = 1;
-        championshipDataRepository.save(new ChampionshipData(ChampionshipDataType.ROUND, round.toString()));
-        return round;
+    private ChampionshipData startFirstRound() throws NoChampionshipFoundException {
+        ChampionshipData championshipData = getCurrentChampionshipData();
+        championshipData.setOngoingRound(true);
+        championshipData.setRound(1);
+        return championshipDataRepository.save(championshipData);
     }
 
-    private Integer getRoundPlusOne(ChampionshipData roundData) {
-        Integer round = Integer.parseInt(roundData.getValue()) + 1;
-        roundData.setValue(round.toString());
-        championshipDataRepository.save(roundData);
-        return round;
-    }
-
-    private void createDraw(Integer round) {
-        List<Player> players = playerService.getAllPlayers();
-        HashMap<Player, List<Team>> awayTeamMap = getTeamsInMap(players);
+    private void createDraw(Integer round, HashMap<Player, List<Team>> awayTeamMap) throws NoPlayerFoundException {
+        List<Player> players = new ArrayList<>(awayTeamMap.keySet());
 
         while (!awayTeamMap.isEmpty()) {
             assignTeamsOfOnePlayer(round, players, awayTeamMap);
         }
     }
 
-    private void assignTeamsOfOnePlayer(Integer round, List<Player> players, HashMap<Player, List<Team>> awayTeamMap) {
-        Player homeTeamPlayer = getHomeTeamPlayer(players);
+    private void assignTeamsOfOnePlayer(Integer round, List<Player> awayPlayers, HashMap<Player, List<Team>> awayTeamMap) throws NoPlayerFoundException {
+        Player homeTeamPlayer = getHomeTeamPlayer(awayTeamMap, awayPlayers);
         List<Team> homeTeamList = getHomeTeamList(awayTeamMap, homeTeamPlayer);
         int availableTeamCount = getAvailableTeamCount(awayTeamMap);
         int counter = 0;
 
         while (!(homeTeamList.size() <= 0 || availableTeamCount <= 0)) {
-            createMatch(round, players, homeTeamList, awayTeamMap, counter);
+            createMatch(round, awayPlayers, homeTeamList, awayTeamMap, counter);
             availableTeamCount--;
             counter++;
         }
@@ -97,7 +152,7 @@ public class ChampionshipService {
     }
 
     private void createMatchWithOnePlayer(Integer round, List<Team> teamList) {
-        while (!(teamList.size() <= 0)) {
+        while (!(teamList.size() <= 1)) {
             Team homeTeam = teamList.get(0);
             Team awayTeam = teamList.get(1);
             teamList.remove(1);
@@ -145,14 +200,29 @@ public class ChampionshipService {
                 .sum();
     }
 
-    private Player getHomeTeamPlayer(List<Player> players) {
-        Player homeTeamPlayer = players.stream()
-                .max(Comparator.comparing(p -> p.getOwnTeams().size())).get();
-        players.remove(homeTeamPlayer);
+    private Player getHomeTeamPlayer(HashMap<Player, List<Team>> teams, List<Player> awayPlayers) throws NoPlayerFoundException {
+        Player homeTeamPlayer = teams.keySet().stream()
+                .max(Comparator.comparing(p -> teams.get(p).size()))
+                .orElseThrow(NoPlayerFoundException::new);
+        awayPlayers.remove(homeTeamPlayer);
         return homeTeamPlayer;
     }
 
-    private HashMap<Player, List<Team>> getTeamsInMap(List<Player> players) {
+    private HashMap<Player, List<Team>> getWinnersOfLastRound(ChampionshipData championshipData) {
+        List<Team> teams = matchRepository.findMatchesById_RoundNumber(championshipData.getRound() - 1)
+                .stream()
+                .map(Match::getWinner)
+                .collect(Collectors.toList());
+
+        HashMap<Player, List<Team>> playerAndTeamsMap = new HashMap<>();
+        teams.forEach(team -> {
+            playerAndTeamsMap.computeIfAbsent(team.getOwner(), k -> new ArrayList<>()).add(team);
+        });
+        return playerAndTeamsMap;
+    }
+
+    private HashMap<Player, List<Team>> getNewTeamsInMap() {
+        List<Player> players = playerService.getAllPlayers();
         HashMap<Player, List<Team>> awayTeamMap = new HashMap<>();
         players.forEach(p -> awayTeamMap.put(p, new ArrayList<>(p.getOwnTeams())));
         return awayTeamMap;
@@ -168,4 +238,5 @@ public class ChampionshipService {
         checkIfPowerOfTwo(num / 2);
     }
     //endregion
+
 }

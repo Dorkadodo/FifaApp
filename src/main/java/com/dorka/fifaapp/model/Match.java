@@ -26,8 +26,13 @@ public class Match{
     @MapsId("awayTeamId")
     @JoinColumn(name = "AWAY_TEAM_ID")
     private Team awayTeam;
+
     private Integer homeTeamScore;
     private Integer awayTeamScore;
+
+    @ManyToOne
+    @JoinColumn(name = "WINNER_ID")
+    private Team winner;
 
     public Match(MatchKey key, Team homeTeam, Team awayTeam) {
         id = key;

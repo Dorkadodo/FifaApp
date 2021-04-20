@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,13 +28,20 @@ public class Team {
     @OneToMany (mappedBy = "homeTeam")
     private List<Match> awayTeamMatches;
 
+    @OneToMany (mappedBy = "winner")
+    private List<Match> matchesWon;
+
     public Team() {
-        homeTeamMatches = null;
-        awayTeamMatches = null;
+        homeTeamMatches = new ArrayList<>();
+        awayTeamMatches = new ArrayList<>();
+        matchesWon = new ArrayList<>();
     }
 
     public Team(String name, Player owner) {
         this.owner = owner;
         this.name = name;
+        homeTeamMatches = new ArrayList<>();
+        awayTeamMatches = new ArrayList<>();
+        matchesWon = new ArrayList<>();
     }
 }

@@ -1,11 +1,9 @@
 package com.dorka.fifaapp.service;
 
 import com.dorka.fifaapp.exception.MyFileNotFoundException;
-import com.dorka.fifaapp.exception.PlayerNameException;
 import com.dorka.fifaapp.model.Team;
 import com.dorka.fifaapp.model.Player;
 import com.dorka.fifaapp.repo.TeamRepository;
-import com.dorka.fifaapp.repo.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -101,4 +99,11 @@ public class TeamService {
         return (List<Team>)teamRepository.findAll();
     }
 
+    public Team getTeamById(Long id) {
+        return teamRepository.findById(id).orElse(null);
+    }
+
+    public void deleteAllTeams() {
+        teamRepository.deleteAll();
+    }
 }

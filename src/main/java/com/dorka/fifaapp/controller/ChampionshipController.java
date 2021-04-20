@@ -1,6 +1,9 @@
 package com.dorka.fifaapp.controller;
 
 import com.dorka.fifaapp.exception.InvalidNumberOfTeamsException;
+import com.dorka.fifaapp.exception.NoChampionshipFoundException;
+import com.dorka.fifaapp.exception.NoPlayerFoundException;
+import com.dorka.fifaapp.exception.UnfinishedRoundException;
 import com.dorka.fifaapp.service.ChampionshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,12 +26,38 @@ public class ChampionshipController {
         if (invalidNumberError != null) {
             model.addAttribute("invalidNumberError", invalidNumberError);
         }
+        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
+        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
         return "championshipPage";
     }
 
-    @GetMapping("/fifa/championship/draw")
-    public String draw(Model model) throws InvalidNumberOfTeamsException {
-        model.addAttribute("matchList", championshipService.draw());
+    @GetMapping("/fifa/championship/new")
+    public String newChampionship() {
+        championshipService.startNewChampionship();
+        return "redirect:/fifa/team";
+    }
+
+    @GetMapping("/fifa/championship/first-draw")
+    public String firstDraw(Model model)
+            throws InvalidNumberOfTeamsException, NoPlayerFoundException, NoChampionshipFoundException {
+        model.addAttribute("matchList", championshipService.drawOfNewChampionship());
+        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
+        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
         return "championshipPage";
     }
+
+    @GetMapping("/fifa/championship/ongoing-draw")
+    public String ongoingDraw(Model model)
+            throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
+        model.addAttribute("matchList", championshipService.drawOfOngoingChampionship());
+        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
+        model.addAttribute("ongoingRound", championshipService.isOngoingRound())
+        return "championshipPage";
+    }
+
+//    @GetMapping("/fifa/championship/redraw")
+//    public String redraw(Model model) throws InvalidNumberOfTeamsException, UnfinishedRoundException {
+//        model.addAttribute("matchList", championshipService.redraw());
+//        return "championshipPage";
+//    }
 }

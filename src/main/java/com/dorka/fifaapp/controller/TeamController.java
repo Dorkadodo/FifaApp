@@ -2,6 +2,7 @@ package com.dorka.fifaapp.controller;
 
 import com.dorka.fifaapp.exception.PlayerNameException;
 import com.dorka.fifaapp.model.ChosenTeamListDTO;
+import com.dorka.fifaapp.service.ChampionshipService;
 import com.dorka.fifaapp.service.TeamService;
 import com.dorka.fifaapp.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,14 @@ public class TeamController {
 
     private TeamService teamService;
     private PlayerService playerService;
+    private ChampionshipService championshipService;
 
     @Autowired
-    public TeamController(TeamService teamService, PlayerService playerService) {
+    public TeamController(TeamService teamService, PlayerService playerService,
+                          ChampionshipService championshipService) {
         this.teamService = teamService;
         this.playerService = playerService;
+        this.championshipService = championshipService;
     }
 
     @GetMapping ("/fifa/team")
@@ -26,6 +30,8 @@ public class TeamController {
         model.addAttribute("teamList", teamService.getAvailableNationalTeams());
         model.addAttribute("chosenTeams", new ChosenTeamListDTO());
         model.addAttribute("playerList", playerService.getPlayersWithTeamCount());
+        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
+        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
         return "teamsPage";
     }
 
