@@ -21,6 +21,8 @@ public class ChampionshipData {
     private boolean ongoingChampionship = true;
     @Column(nullable = false)
     private boolean ongoingRound = false;
+    @Column(nullable = false)
+    private boolean ongoingTeamSelection = true;
     private Timestamp startTime;
     private String winnerName;
 

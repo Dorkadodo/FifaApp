@@ -1,5 +1,6 @@
 package com.dorka.fifaapp.controller;
 
+import com.dorka.fifaapp.exception.InvalidTeamNameException;
 import com.dorka.fifaapp.exception.PlayerNameException;
 import com.dorka.fifaapp.model.ChosenTeamListDTO;
 import com.dorka.fifaapp.service.ChampionshipService;
@@ -32,6 +33,7 @@ public class TeamController {
         model.addAttribute("playerList", playerService.getPlayersWithTeamCount());
         model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
         model.addAttribute("ongoingRound", championshipService.isOngoingRound());
+        model.addAttribute("ongoingTeamSelection", championshipService.isOngoingTeamSelection());
         return "teamsPage";
     }
 
@@ -46,4 +48,12 @@ public class TeamController {
         teamService.changeName(id, name);
         return "redirect:/fifa/team";
     }
+
+    @GetMapping("/fifa/team/delete/{teamName}")
+    public String removeTeamFromPlayer (@PathVariable String teamName, @RequestParam String player)
+            throws InvalidTeamNameException {
+        teamService.deleteTeamByName(teamName);
+        return "redirect:/fifa/player/" + player;
+    }
+
 }

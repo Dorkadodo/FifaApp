@@ -108,7 +108,12 @@ public class TeamService {
         teamRepository.deleteAll();
     }
 
-    public Team getByName(String name) throws InvalidTeamNameException {
+    public Team getTeamByName(String name) throws InvalidTeamNameException {
         return teamRepository.findByName(name).orElseThrow(InvalidTeamNameException::new);
+    }
+
+    public void deleteTeamByName(String teamName) throws InvalidTeamNameException {
+        Team team = getTeamByName(teamName);
+        teamRepository.delete(team);
     }
 }

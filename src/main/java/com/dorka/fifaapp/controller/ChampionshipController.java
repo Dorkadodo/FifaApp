@@ -11,10 +11,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Controller
 public class ChampionshipController {
 
     private ChampionshipService championshipService;
+    private static Logger logger = Logger.getLogger("ChampionshipController");
 
     @Autowired
     public ChampionshipController(ChampionshipService championshipService) {
@@ -22,15 +27,11 @@ public class ChampionshipController {
     }
 
     @GetMapping("/fifa/championship")
-    public String championship(@RequestParam(required = false) String invalidNumberError, Model model)
-            throws NoChampionshipFoundException {
+    public String championship(@RequestParam(required = false) String invalidNumberError, Model model) {
         if (invalidNumberError != null) {
             model.addAttribute("invalidNumberError", invalidNumberError);
         }
-        model.addAttribute("matchList", championshipService.getCurrentMatches());
-        model.addAttribute("matchResult", new MatchResultDTO());
-        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
-        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
+        model.addAllAttributes(generalAttributes());
         return "championshipPage";
     }
 
@@ -41,33 +42,40 @@ public class ChampionshipController {
     }
 
     @GetMapping("/fifa/championship/first-draw")
-    public String firstDraw(Model model)
+    public String firstDraw()
             throws InvalidNumberOfTeamsException, NoPlayerFoundException, NoChampionshipFoundException {
-        model.addAttribute("matchList", championshipService.drawOfNewChampionship());
-        model.addAttribute("matchResult", new MatchResultDTO());
-        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
-        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
-        return "championshipPage";
+        championshipService.drawOfNewChampionship();
+        return "redirect:/fifa/championship";
     }
 
     @GetMapping("/fifa/championship/ongoing-draw")
-    public String ongoingDraw(Model model)
+    public String ongoingDraw()
             throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
-        model.addAttribute("matchList", championshipService.drawOfOngoingChampionship());
-        model.addAttribute("matchResult", new MatchResultDTO());
-        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
-        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
-        return "championshipPage";
+        championshipService.drawOfOngoingChampionship();
+        return "redirect:/fifa/championship";
     }
 
     @PostMapping("/fifa/championship/match")
     public String setResult(@ModelAttribute MatchResultDTO matchResult)
             throws InvalidTeamNameException, NoChampionshipFoundException,
             MissingParameterException, MatchResultException {
-        System.out.println(matchResult.getAwayteamName() + matchResult.getAwayteamScore());
-
         championshipService.setResultOfMatch(matchResult);
         return "redirect:/fifa/championship";
+    }
+
+    private HashMap<String, Object> generalAttributes() {
+        HashMap<String, Object> generalAttributes = new HashMap<>();
+        try {
+            generalAttributes.put("matchList", championshipService.getCurrentMatches());
+        } catch (NoChampionshipFoundException e) {
+            logger.log(Level.WARNING, "NoChampionshipFoundException");
+        }
+        generalAttributes.put("matchResult", new MatchResultDTO());
+        generalAttributes.put("ongoingChampionship", championshipService.isOngoingChampionship());
+        generalAttributes.put("ongoingRound", championshipService.isOngoingRound());
+        generalAttributes.put("ongoingTeamSelection", championshipService.isOngoingTeamSelection());
+        generalAttributes.put("winnerOfLastChampionship", championshipService.getWinnerOfLastChampionship());
+        return generalAttributes;
     }
 
 

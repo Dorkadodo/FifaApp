@@ -8,7 +8,7 @@
 <div th:replace="fragments :: header"/>
 <div th:replace="fragments :: navBar"/>
 
-<form th:unless="${ongoingChampionship}" action="/fifa/team" method="post">
+<form th:if="${ongoingTeamSelection}" action="/fifa/team" method="post">
     <h2>Choose new teams:</h2>
     <label for="player">Player name:</label>
     <select id="player" name="player">

@@ -46,7 +46,7 @@ public class ChampionshipService {
             throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
         ChampionshipData championshipData = getCurrentChampionshipData();
         Integer round = getNewRoundForDraw(championshipData).getRound();
-        HashMap<Player, List<Team>> teams = getWinnersOfLastRound(championshipData);
+        HashMap<Player, List<Team>> teams = getWinnersOfRound(championshipData.getRound() - 1);
         createDraw(round, teams);
         return matchRepository.findMatchesById_RoundNumber(round);
     }
@@ -62,17 +62,41 @@ public class ChampionshipService {
         Match match = getMatch(matchResult, championshipData.getRound());
         match.setHomeTeamScore(matchResult.getHometeamScore());
         match.setAwayTeamScore(matchResult.getAwayteamScore());
-        setWinner(match, matchResult);
+        setWinnerOfMatch(match, matchResult);
         matchRepository.save(match);
-        finishRoundIfNeeded(championshipData);
+        if (finishRoundIfNeeded(championshipData)) {
+            finishChampionshipIfNeeded(championshipData);
+        }
     }
 
     //region MatchResultPrivateMethods
-    private void finishRoundIfNeeded(ChampionshipData championshipData) {
+    public String getWinnerOfLastChampionship() {
+        try {
+            return getCurrentChampionshipData().getWinnerName();
+        } catch (NoChampionshipFoundException e) {
+            return null;
+        }
+    }
+
+    private void finishChampionshipIfNeeded(ChampionshipData championshipData) {
+        HashMap<Player, List<Team>> winnersOfFinishedRound = getWinnersOfRound(championshipData.getRound());
+        if (getAvailableTeamCount(winnersOfFinishedRound) == 1) {
+            Player winningPlayer = winnersOfFinishedRound.keySet().stream()
+                                        .findFirst().get();
+            Team winningTeam = winnersOfFinishedRound.get(winningPlayer).get(0);
+            championshipData.setWinnerName(winningTeam.getName() + " (" + winningPlayer.getName() + ")");
+            championshipData.setOngoingChampionship(false);
+            championshipDataRepository.save(championshipData);
+        }
+    }
+
+    private boolean finishRoundIfNeeded(ChampionshipData championshipData) {
         if (checkIfRoundIsFinished(championshipData.getRound())) {
             championshipData.setOngoingRound(false);
             championshipDataRepository.save(championshipData);
+            return true;
         }
+        return false;
     }
 
     private Boolean checkIfRoundIsFinished(Integer round) {
@@ -88,13 +112,13 @@ public class ChampionshipService {
                 || matchResult.getAwayteamScore() == null || matchResult.getAwayteamName() == null) {
             throw new MissingParameterException();
         }
-        if (matchResult.getAwayteamScore().equals(matchResult.getAwayteamScore())
+        if (matchResult.getHometeamScore().equals(matchResult.getAwayteamScore())
                 || matchResult.getAwayteamScore() < 0 || matchResult.getHometeamScore() < 0) {
             throw new MatchResultException("The provided score is invalid");
         }
     }
 
-    private void setWinner(Match match, MatchResultDTO matchResult) {
+    private void setWinnerOfMatch(Match match, MatchResultDTO matchResult) {
         if (matchResult.getAwayteamScore() < matchResult.getHometeamScore()) {
             match.setWinner(match.getHomeTeam());
         } else {
@@ -104,8 +128,8 @@ public class ChampionshipService {
 
     private Match getMatch(MatchResultDTO matchResult, Integer round)
             throws InvalidTeamNameException, MatchResultException {
-        Team hometeam = teamService.getByName(matchResult.getHometeamName());
-        Team awayteam = teamService.getByName(matchResult.getAwayteamName());
+        Team hometeam = teamService.getTeamByName(matchResult.getHometeamName());
+        Team awayteam = teamService.getTeamByName(matchResult.getAwayteamName());
         return matchRepository.findById_HomeTeamIdAndId_AwayTeamIdAndId_RoundNumber(
                 hometeam.getId(), awayteam.getId(), round)
                 .orElseThrow(() -> new MatchResultException("No match found with the given parameters!"));
@@ -128,8 +152,16 @@ public class ChampionshipService {
         return false;
     }
 
+    public Boolean isOngoingTeamSelection() {
+        Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
+        if (optionalCSD.isPresent()) {
+            return optionalCSD.get().isOngoingChampionship() && optionalCSD.get().isOngoingTeamSelection();
+        }
+        return false;
+    }
+
     public void startNewChampionship() {
-        finishLastChampionship();
+        finishPreviousChampionship();
         championshipDataRepository.save(new ChampionshipData());
     }
 
@@ -137,7 +169,7 @@ public class ChampionshipService {
         return matchRepository.findMatchesById_RoundNumber(getCurrentChampionshipData().getRound());
     }
 
-    private void finishLastChampionship() {
+    private void finishPreviousChampionship() {
         try {
             ChampionshipData lastChampionship = getCurrentChampionshipData();
             lastChampionship.setOngoingChampionship(false);
@@ -168,6 +200,7 @@ public class ChampionshipService {
 
     private ChampionshipData startFirstRound() throws NoChampionshipFoundException {
         ChampionshipData championshipData = getCurrentChampionshipData();
+        championshipData.setOngoingTeamSelection(false);
         championshipData.setOngoingRound(true);
         championshipData.setRound(1);
         return championshipDataRepository.save(championshipData);
@@ -267,8 +300,8 @@ public class ChampionshipService {
         return homeTeamPlayer;
     }
 
-    private HashMap<Player, List<Team>> getWinnersOfLastRound(ChampionshipData championshipData) {
-        List<Team> teams = matchRepository.findMatchesById_RoundNumber(championshipData.getRound() - 1)
+    private HashMap<Player, List<Team>> getWinnersOfRound(Integer round) {
+        List<Team> teams = matchRepository.findMatchesById_RoundNumber(round)
                 .stream()
                 .map(Match::getWinner)
                 .collect(Collectors.toList());

@@ -21,7 +21,7 @@ public class Player {
     @Column(unique = true)
     private String name;
 
-    @OneToMany (mappedBy = "owner")
+    @OneToMany (mappedBy = "owner", cascade = CascadeType.REMOVE)
     private List<Team> ownTeams;
 
     public Player(String name){

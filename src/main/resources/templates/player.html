@@ -14,6 +14,7 @@
         <th>Teams:</th>
         <tr th:each="team : ${teamList}">
             <td th:text="${team}"/>
+            <td th:if="${ongoingTeamSelection}"><a th:href="'/fifa/team/delete/' + ${team} + '?player=' + ${playerName}">DELETE</a></td>
         </tr>
     </table>
 
