@@ -8,7 +8,11 @@ import com.dorka.fifaapp.repo.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,14 +67,30 @@ public class TeamService {
     }
 
     private List<String> loadAllNationNames() throws MyFileNotFoundException {
-        Path path = Paths.get("src/main/resources/static/nations.txt");
         teamNames = new ArrayList<>();
-        try {
-            teamNames = Files.readAllLines(path);
+        InputStream is = getFileFromResourceAsStream("nations.txt");
+        try (InputStreamReader streamReader =
+                     new InputStreamReader(is, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(streamReader)) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                teamNames.add(line);
+            }
         } catch (IOException e) {
-            throw new MyFileNotFoundException();
+            e.printStackTrace();
         }
         return teamNames;
+    }
+
+    private InputStream getFileFromResourceAsStream(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        if (inputStream == null) {
+            throw new IllegalArgumentException("file not found! " + fileName);
+        } else {
+            return inputStream;
+        }
     }
 
     public void changeName(Long id, String newName) {
@@ -97,7 +117,7 @@ public class TeamService {
     }
 
     public List<Team> getAllTeams() {
-        return (List<Team>)teamRepository.findAll();
+        return (List<Team>) teamRepository.findAll();
     }
 
     public Team getTeamById(Long id) {

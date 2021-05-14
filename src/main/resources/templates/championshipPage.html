@@ -1,47 +1,58 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Fifa Championship</title>
+    <link th:href="@{/styles.css}" type="text/css" rel="stylesheet">
 </head>
+
 <body>
-<div th:replace="fragments :: header"/>
-<div th:replace="fragments :: navBar"/>
 
-<p th:if="${invalidNumberError}" style="color: red">This number of teams can't be used. It should be power of two (eg. 16, 32, 63...)</p>
-<a th:unless="${ongoingChampionship}" href="/fifa/championship/new">START NEW CHAMPIONSHIP</a>
-<a th:if="${ongoingTeamSelection}" href="/fifa/championship/first-draw">START FIRST ROUND</a>
-<a th:if="${ongoingChampionship} and !${ongoingTeamSelection} and !${ongoingRound}" href="/fifa/championship/ongoing-draw">START NEXT ROUND</a>
-<a th:if="${ongoingRound}" href="/fifa/championship/redraw">REDRAW CURRENT ROUND</a>
+    <div th:replace="fragments :: header"/>
 
-<section th:unless="${#lists.isEmpty(matchList)}" id="matchResultList">
-    <h2>Matches:</h2>
-    <table>
-        <tr th:each="match : ${matchList}">
-            <form th:if="${match.homeTeamScore} == null" action="/fifa/championship/match" method="post" th:object="${matchResult}">
-                <td th:text="${match.homeTeam.name}"/>
-                <input type="hidden" th:value="${match.homeTeam.name}" name="hometeamName">
-                <td>
-                    <input type="number" min="0" th:field="*{hometeamScore}">
-                </td>
-                <td> : </td>
-                <td>
-                    <input type="number" min="0" th:field="*{awayteamScore}">
-                </td>
-                <td th:text="${match.awayTeam.name}"/>
-                <input type="hidden" th:value="${match.awayTeam.name}" name="awayteamName">
-                <td><button type="submit"/>SUBMIT</td>
-            </form>
-            <div th:unless="${match.homeTeamScore} == null">
-                <td th:text="${match.homeTeam.name}"/>
-                <td th:text="${match.homeTeamScore}"/>
-                <td> : </td>
-                <td th:text="${match.awayTeamScore}"/>
-                <td th:text="${match.awayTeam.name}"/>
-            </div>
-        </tr>
-    </table>
-</section>
+    <main id="championship-content" class="content">
+
+        <div id="championship-status">
+
+            <p th:if="${invalidNumberError}" style="color: red">This number of teams can't be used. It should be power of two (eg. 16, 32, 63...)</p>
+            <a th:unless="${ongoingChampionship}" href="/fifa/championship/new">START NEW CHAMPIONSHIP</a>
+            <a th:if="${ongoingTeamSelection}" href="/fifa/championship/first-draw">START FIRST ROUND</a>
+            <a th:if="${ongoingChampionship} and !${ongoingTeamSelection} and !${ongoingRound}" href="/fifa/championship/ongoing-draw">START NEXT ROUND</a>
+            <a th:if="${ongoingRound}" href="/fifa/championship/redraw">REDRAW CURRENT ROUND</a>
+
+        </div>
+
+        <section th:unless="${#lists.isEmpty(matchList)}" id="matchResultList">
+            <h2>Matches:</h2>
+            <table>
+                <tr th:each="match : ${matchList}">
+                    <form th:if="${match.homeTeamScore} == null" action="/fifa/championship/match" method="post" th:object="${matchResult}">
+                        <td th:text="${match.homeTeam.name}"/>
+                        <input type="hidden" th:value="${match.homeTeam.name}" name="hometeamName">
+                        <td>
+                            <input type="number" min="0" th:field="*{hometeamScore}">
+                        </td>
+                        <td> : </td>
+                        <td>
+                            <input type="number" min="0" th:field="*{awayteamScore}">
+                        </td>
+                        <td th:text="${match.awayTeam.name}"/>
+                        <input type="hidden" th:value="${match.awayTeam.name}" name="awayteamName">
+                        <td><button type="submit"/>SUBMIT</td>
+                    </form>
+                    <div th:unless="${match.homeTeamScore} == null">
+                        <td th:text="${match.homeTeam.name}"/>
+                        <td th:text="${match.homeTeamScore}"/>
+                        <td> : </td>
+                        <td th:text="${match.awayTeamScore}"/>
+                        <td th:text="${match.awayTeam.name}"/>
+                    </div>
+                </tr>
+            </table>
+        </section>
+
+    </main>
 
 </body>
 </html>

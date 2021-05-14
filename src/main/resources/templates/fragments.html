@@ -1,11 +1,12 @@
 <div th:fragment="header" id="header">
-    <h1>FIFA APP for Pálok</h1>
-</div>
+    <img id="header-logo" th:src="@{/img/fifa-logo.png}">
 
-<div th:fragment="navBar" id="navBar">
     <nav>
-        <a href="/fifa/team">Teams</a>
-        <a href="/fifa/player">Players</a>
-        <a href="/fifa/championship">Championship</a>
+        <ul>
+            <li><a href="/fifa/team">Teams</a></li>
+            <li><a href="/fifa/player">Players</a></li>
+            <li><a href="/fifa/championship">Championship</a></li>
+        </ul>
     </nav>
+
 </div>

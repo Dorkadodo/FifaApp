@@ -5,8 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 @ControllerAdvice
 public class MyExceptionHandler {
@@ -20,41 +19,41 @@ public class MyExceptionHandler {
 
     @ExceptionHandler(PlayerNameException.class)
     public String playerNameExceptionHandler(PlayerNameException ex, Model model) {
-        logger.log(Level.WARNING, ex.getMessage());
+        logger.warn(ex.getMessage());
         model.addAttribute("errorMessage", ex.getMessage());
         return "error";
     }
 
     @ExceptionHandler(InvalidNumberOfTeamsException.class)
     public String invalidNumberOfTeamsExceptionHandler() {
-        logger.log(Level.WARNING, "InvalidNumberOfTeamsException");
+        logger.warn("InvalidNumberOfTeamsException");
         return "redirect:/fifa/championship?invalidNumberError=true";
     }
 
     @ExceptionHandler(UnfinishedRoundException.class)
     public String unfinishedRoundExceptionHandler(Model model) {
-        logger.log(Level.WARNING, "UnfinishedRoundException");
+        logger.warn("UnfinishedRoundException");
         model.addAttribute("errorMessage", "Current round is not yet finished");
         return "error";
     }
 
     @ExceptionHandler(NoChampionshipFoundException.class)
     public String noChampionshipFoundExceptionHandler(Model model) {
-        logger.log(Level.WARNING, "NoChampionshipFoundException");
+        logger.warn("NoChampionshipFoundException");
         model.addAttribute("errorMessage", "Currently there is no ongoing championship");
         return "error";
     }
 
     @ExceptionHandler(NoPlayerFoundException.class)
     public String noPlayerFoundExceptionHandler(Model model) {
-        logger.log(Level.WARNING, "NoPlayerFoundException");
+        logger.warn("NoPlayerFoundException");
         model.addAttribute("errorMessage", "Sorry, we couldn't find any player for the draw.");
         return "error";
     }
 
     @ExceptionHandler(MatchResultException.class)
     public String matchResultExceptionHandler(MatchResultException ex, Model model) {
-        logger.log(Level.WARNING, ex.getMessage());
+        logger.warn(ex.getMessage());
         model.addAttribute("errorMessage", ex.getMessage());
         return "error";
     }

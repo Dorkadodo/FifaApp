@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Fifa Championship</title>
+    <link th:href="@{/styles.css}" type="text/css" rel="stylesheet">
 </head>
+
 <body>
+
 <div th:replace="fragments :: header"/>
-<div th:replace="fragments :: navBar"/>
 
+    <main id="player-content" class="content">
 
-    <h2 th:text="${playerName}"/>
-    <table>
-        <th>Teams:</th>
-        <tr th:each="team : ${teamList}">
-            <td th:text="${team}"/>
-            <td th:if="${ongoingTeamSelection}"><a th:href="'/fifa/team/delete/' + ${team} + '?player=' + ${playerName}">DELETE</a></td>
-        </tr>
-    </table>
+        <h2 th:text="${playerName}"/>
 
+        <table>
+            <th>Teams:</th>
+            <tr th:each="team : ${teamList}">
+                <td th:text="${team}"/>
+                <td th:if="${ongoingTeamSelection}"><a th:href="'/fifa/team/delete/' + ${team} + '?player=' + ${playerName}">DELETE</a></td>
+            </tr>
+        </table>
+
+    </main>
 
 </body>
 </html>

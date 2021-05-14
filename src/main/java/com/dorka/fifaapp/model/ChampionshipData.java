@@ -17,11 +17,8 @@ public class ChampionshipData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer round;
-    @Column(nullable = false)
     private boolean ongoingChampionship = true;
-    @Column(nullable = false)
     private boolean ongoingRound = false;
-    @Column(nullable = false)
     private boolean ongoingTeamSelection = true;
     private Timestamp startTime;
     private String winnerName;

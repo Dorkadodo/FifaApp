@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Fifa Championship</title>
+    <link th:href="@{/styles.css}" type="text/css" rel="stylesheet">
 </head>
+
 <body>
+
 <div th:replace="fragments :: header"/>
-<div th:replace="fragments :: navBar"/>
 
-<form action="/fifa/player/create" method="post">
-    <h2>Add a new player</h2>
-    <p th:if="${newNameError}" style="color: red">This player already exists! Choose another name.</p>
-    <label for="newName">Name:</label>
-    <input id="newName" name="newName" type="text">
-    <button type="submit">Save</button>
-</form>
+    <main id="players-content" class="content">
 
-<section id="PlayerList">
-    <h2>List of Players:</h2>
-    <table>
-        <tr th:each="playerName : ${playerList}">
-            <td><a th:href="'/fifa/player/' + ${playerName}" th:text="${playerName}"/> </td>
-            <td th:if="${ongoingTeamSelection}"><a th:href="'/fifa/player/delete/' + ${playerName}">DELETE</a></td>
-        </tr>
-    </table>
-</section>
+        <section>
+            <form action="/fifa/player/create" method="post">
+                <h2>Add a new player</h2>
+                <p th:if="${newNameError}" style="color: red">This player already exists! Choose another name.</p>
+                <label for="newName">Name:</label>
+                <input id="newName" name="newName" type="text">
+                <button type="submit">Save</button>
+            </form>
+        </section>
+
+        <aside>
+            <h2>List of Players:</h2>
+            <table>
+                <tr th:each="playerName : ${playerList}">
+                    <td><a th:href="'/fifa/player/' + ${playerName}" th:text="${playerName}"/> </td>
+                    <td th:if="${ongoingTeamSelection}"><a th:href="'/fifa/player/delete/' + ${playerName}">DELETE</a></td>
+                </tr>
+            </table>
+        </aside>
+
+    </main>
 
 </body>
 </html>

@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Fifa Championship</title>
+    <link th:href="@{/styles.css}" type="text/css" rel="stylesheet">
 </head>
-<body>
-<div th:replace="fragments :: header"/>
-<div th:replace="fragments :: navBar"/>
 
-<h2 th:text="${errorMessage}?${errorMessage}:'Sorry, something went wrong! Please try again.'"/>
+<body>
+    <div th:replace="fragments :: header"/>
+
+    <main id="error-content" class="content">
+
+        <h2 th:text="${errorMessage}?${errorMessage}:'Sorry, something went wrong! Please try again.'"/>
+
+    </main>
 </body>
 </html>
