@@ -1,10 +1,23 @@
+@font-face {
+    font-family: Source;
+    src: url('/font-family/SourceSansPro-Bold.ttf');
+}
+
 body{
     background-image: url('/img/background.jpg');
+    margin: 0;
+    font-family: Source, sans-serif;
+    font-size: larger;
+}
+
+h1, h2, h3{
     margin: 0;
 }
 
 #header{
-    background-color: cadetblue;
+    width: 100%;
+    background-color: #5f9ea0;
+    position: fixed;
 }
 
 #header-logo {
@@ -37,7 +50,8 @@ nav::after{
 }
 
 main{
-    padding: 10px 2%;
+    padding: 70px 2%;
+    border-collapse: separate
 }
 
 .content section{
@@ -52,14 +66,35 @@ main{
     width: 34%;
 }
 
-a {
+a, a:visited {
     text-decoration: none;
     font-weight: bold;
     color: #000;
 }
 
-a:hover {
+a:hover, a:focus {
     color: #555;
+    cursor: pointer;
+}
+
+#championship-status a, #ongoing-championship-status a, #teams-content section form a{
+    background-image: linear-gradient(to bottom left, #3182fa, #ff1b00);
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin: 0 20px 20px 0;
+}
+
+#championship-status a:hover, #championship-status a:focus,
+#ongoing-championship-status a:hover, #ongoing-championship-status a:focus,
+#teams-content section form a:hover, #teams-content section form a:focus{
+    background-image: linear-gradient(to bottom left, #296acc , #cc1600);
+    cursor: pointer;
+    color: black;
+}
+
+#championship-status a:visited, #ongoing-championship-status a:visited, #teams-content section form a:visited{
+    color: black;
 }
 
 #players-content aside table{
@@ -70,9 +105,13 @@ a:hover {
     padding: 10px 0;
 }
 
+.content h2{
+    margin: 20px 0 10px 0;
+}
 button{
     background-color: cadetblue;
     border: 1px solid black;
     border-radius: 4px;
     padding: 5px 12px;
+    cursor: pointer;
 }

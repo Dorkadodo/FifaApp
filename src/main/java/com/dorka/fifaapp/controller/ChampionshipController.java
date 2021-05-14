@@ -27,10 +27,7 @@ public class ChampionshipController {
     }
 
     @GetMapping("/fifa/championship")
-    public String championship(@RequestParam(required = false) String invalidNumberError, Model model) {
-        if (invalidNumberError != null) {
-            model.addAttribute("invalidNumberError", invalidNumberError);
-        }
+    public String championship(Model model) {
         model.addAllAttributes(generalAttributes());
         return "championshipPage";
     }
@@ -52,6 +49,12 @@ public class ChampionshipController {
     public String ongoingDraw()
             throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
         championshipService.drawOfOngoingChampionship();
+        return "redirect:/fifa/championship";
+    }
+
+    @GetMapping("/fifa/championship/redraw")
+    public String redraw(Model model) throws NoPlayerFoundException, NoChampionshipFoundException {
+        championshipService.redrawCurrentRound();
         return "redirect:/fifa/championship";
     }
 
@@ -77,13 +80,4 @@ public class ChampionshipController {
         generalAttributes.put("winnerOfLastChampionship", championshipService.getWinnerOfLastChampionship());
         return generalAttributes;
     }
-
-
-//    @GetMapping("/fifa/championship/redraw")
-//    public String redraw(Model model) throws InvalidNumberOfTeamsException, UnfinishedRoundException {
-//        model.addAttribute("matchList", championshipService.redraw());
-//        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
-//        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
-//        return "championshipPage";
-//    }
 }

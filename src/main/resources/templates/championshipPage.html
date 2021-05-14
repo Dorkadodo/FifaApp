@@ -15,7 +15,6 @@
 
         <div id="championship-status">
 
-            <p th:if="${invalidNumberError}" style="color: red">This number of teams can't be used. It should be power of two (eg. 16, 32, 63...)</p>
             <a th:unless="${ongoingChampionship}" href="/fifa/championship/new">START NEW CHAMPIONSHIP</a>
             <a th:if="${ongoingTeamSelection}" href="/fifa/championship/first-draw">START FIRST ROUND</a>
             <a th:if="${ongoingChampionship} and !${ongoingTeamSelection} and !${ongoingRound}" href="/fifa/championship/ongoing-draw">START NEXT ROUND</a>
@@ -23,7 +22,7 @@
 
         </div>
 
-        <section th:unless="${#lists.isEmpty(matchList)}" id="matchResultList">
+        <section th:unless="${#lists.isEmpty(matchList)}" id="match-result-list">
             <h2>Matches:</h2>
             <table>
                 <tr th:each="match : ${matchList}">

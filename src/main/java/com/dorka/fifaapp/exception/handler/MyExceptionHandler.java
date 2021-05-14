@@ -27,7 +27,7 @@ public class MyExceptionHandler {
     @ExceptionHandler(InvalidNumberOfTeamsException.class)
     public String invalidNumberOfTeamsExceptionHandler() {
         logger.warn("InvalidNumberOfTeamsException");
-        return "redirect:/fifa/championship?invalidNumberError=true";
+        return "redirect:/fifa/team?invalidNumberError=true";
     }
 
     @ExceptionHandler(UnfinishedRoundException.class)

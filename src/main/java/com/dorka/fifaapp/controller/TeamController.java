@@ -27,7 +27,10 @@ public class TeamController {
     }
 
     @GetMapping ("/fifa/team")
-    public String showAllTeams(Model model) {
+    public String showAllTeams(@RequestParam(required = false) String invalidNumberError, Model model) {
+        if (invalidNumberError != null) {
+            model.addAttribute("invalidNumberError", invalidNumberError);
+        }
         model.addAttribute("teamList", teamService.getAvailableNationalTeams());
         model.addAttribute("chosenTeams", new ChosenTeamListDTO());
         model.addAttribute("playerList", playerService.getPlayersWithTeamCount());
