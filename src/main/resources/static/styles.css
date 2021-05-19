@@ -34,7 +34,6 @@ nav ul {
 nav a {
     text-decoration: none;
     text-transform: uppercase;
-    float: right;
     color: #000;
     padding: 15px;
 }
@@ -43,10 +42,28 @@ nav a:hover {
     color: #555;
 }
 
-nav::after{
-    content: "";
-    display: block;
-    clear: both;
+@media screen and (min-width: 480px){
+    #header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    #header-logo {
+        display: flex;
+        align-content: flex-start;
+    }
+
+    nav ul {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    nav li{
+        flex: 1 1 0;
+    }
 }
 
 main{
@@ -78,8 +95,8 @@ a:hover, a:focus {
 }
 
 #championship-status a, #ongoing-championship-status a, #teams-content section form a{
-    background-image: linear-gradient(to bottom left, #3182fa, #ff1b00);
-    border: 1px solid black;
+    background-image: linear-gradient(to bottom left, #004bff, #004bff 35%, #ff1b00 65%, #ff1b00);
+    border: none;
     border-radius: 4px;
     padding: 5px 12px;
     margin: 0 20px 20px 0;
@@ -88,7 +105,7 @@ a:hover, a:focus {
 #championship-status a:hover, #championship-status a:focus,
 #ongoing-championship-status a:hover, #ongoing-championship-status a:focus,
 #teams-content section form a:hover, #teams-content section form a:focus{
-    background-image: linear-gradient(to bottom left, #296acc , #cc1600);
+    background-image: linear-gradient(to bottom left, #0034b1, #0034b1 35%, #cc1600 65%, #cc1600);
     cursor: pointer;
     color: black;
 }
@@ -113,5 +130,12 @@ button{
     border: 1px solid black;
     border-radius: 4px;
     padding: 5px 12px;
+    font-weight: bolder;
+    color: black;
+    text-transform: uppercase;
     cursor: pointer;
+}
+
+button:hover, button:focus{
+    background-color: #4f8283;
 }
