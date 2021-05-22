@@ -7,14 +7,19 @@
 </head>
 
 <body>
+<div class="container">
 
 <div th:replace="fragments :: header"/>
 
-<main id="teams-content" class="content">
+<main class="teams content">
+
+    <div th:if="${ongoingTeamSelection}" class="championship-status">
+        <a href="/fifa/championship/first-draw">START FIRST ROUND</a>
+    </div>
 
     <section>
         <form th:if="${ongoingTeamSelection}" action="/fifa/team" method="post">
-            <a href="/fifa/championship/first-draw">START FIRST ROUND</a>
+
             <p th:if="${invalidNumberError}" style="color: red">This number of teams can't be used. It should be power of two (eg. 16, 32, 63...)</p>
 
             <h2>Choose new teams:</h2>
@@ -32,10 +37,10 @@
             </table>
         </form>
 
-        <div id="ongoing-championship-status" th:unless="${ongoingTeamSelection}">
+        <div class="championship-status" th:unless="${ongoingTeamSelection}">
             <p>There is an ongoing championship at the moment.<br>
             If you start a new Championship, the current team selections and matches will be deleted.</p>
-            <a href="/fifa/championship/new">START NEW CHAMPIONSHIP</a>
+            <a href="/fifa/championship/new">NEW CHAMPIONSHIP</a>
         </div>
     </section>
 
@@ -50,5 +55,9 @@
     </aside>
 
 </main>
+
+</div>
+
+<script th:src="@{/app.js}" type="text/javascript"></script>
 </body>
 </html>

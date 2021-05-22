@@ -26,6 +26,11 @@ public class ChampionshipController {
         this.championshipService = championshipService;
     }
 
+    @GetMapping("/")
+    public String root(){
+        return "redirect:/fifa/championship";
+    }
+
     @GetMapping("/fifa/championship")
     public String championship(Model model) {
         model.addAllAttributes(generalAttributes());

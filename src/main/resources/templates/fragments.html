@@ -1,12 +1,15 @@
 <div th:fragment="header" id="header">
-    <img id="header-logo" th:src="@{/img/fifa-logo.png}">
+    <a id="header-logo"><img th:src="@{/img/fifa-logo.png}"></a>
 
-    <nav>
-        <ul>
-            <li><a href="/fifa/team">Teams</a></li>
-            <li><a href="/fifa/player">Players</a></li>
-            <li><a href="/fifa/championship">Championship</a></li>
-        </ul>
+    <div id="menu-icon">
+        <a><img th:src="@{/img/menu-icon.png}"></a>
+    </div>
+
+    <nav id="menu">
+            <ul>
+                <li><a href="/fifa/team">Teams</a></li>
+                <li><a href="/fifa/player">Players</a></li>
+                <li><a href="/fifa/championship">Championship</a></li>
+            </ul>
     </nav>
-
 </div>

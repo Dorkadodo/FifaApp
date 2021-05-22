@@ -8,12 +8,12 @@
 </head>
 
 <body>
-
+<div class="container">
     <div th:replace="fragments :: header"/>
 
-    <main id="championship-content" class="content">
+    <main class="championship content">
 
-        <div id="championship-status">
+        <div class="championship-status">
 
             <a th:unless="${ongoingChampionship}" href="/fifa/championship/new">START NEW CHAMPIONSHIP</a>
             <a th:if="${ongoingTeamSelection}" href="/fifa/championship/first-draw">START FIRST ROUND</a>
@@ -53,5 +53,8 @@
 
     </main>
 
+</div>
+
+<script th:src="@{/app.js}" type="text/javascript"></script>
 </body>
 </html>
