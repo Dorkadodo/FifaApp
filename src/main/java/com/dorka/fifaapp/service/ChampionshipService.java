@@ -4,45 +4,52 @@ import com.dorka.fifaapp.exception.*;
 import com.dorka.fifaapp.model.*;
 import com.dorka.fifaapp.repo.ChampionshipDataRepository;
 import com.dorka.fifaapp.repo.MatchRepository;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class ChampionshipService {
 
-    private TeamService teamService;
-    private DrawService drawService;
-    private MatchRepository matchRepository;
-    private ChampionshipDataRepository championshipDataRepository;
+    private final TeamService teamService;
+    private final DrawFuns drawFuns;
+    private final MatchRepository matchRepository;
+    private final ChampionshipDataRepository championshipDataRepository;
 
-    private static Logger logger = Logger.getLogger("ChampionshipService");
+    private static final Logger logger = LogManager.getLogger("ChampionshipService");
 
     @Autowired
     public ChampionshipService(
-            TeamService teamService, DrawService drawService,
-            MatchRepository matchRepository, ChampionshipDataRepository championshipDataRepository) {
+            TeamService teamService,
+            DrawFuns drawFuns,
+            MatchRepository matchRepository,
+            ChampionshipDataRepository championshipDataRepository
+    ) {
         this.teamService = teamService;
-        this.drawService = drawService;
+        this.drawFuns = drawFuns;
         this.matchRepository = matchRepository;
         this.championshipDataRepository = championshipDataRepository;
     }
 
     public void drawOfNewChampionship()
             throws InvalidNumberOfTeamsException, NoPlayerFoundException, NoChampionshipFoundException {
-        drawService.checkIfPowerOfTwo(teamService.getAllTeams().size());
+        drawFuns.checkIfPowerOfTwo(teamService.getAllTeams().size());
         ChampionshipData championshipData = startFirstRound();
-        drawService.drawOfNewChampionship(championshipData);
+        drawFuns.drawOfNewChampionship(championshipData);
     }
 
     public void drawOfOngoingChampionship()
             throws UnfinishedRoundException, NoChampionshipFoundException, NoPlayerFoundException {
         ChampionshipData championshipData = getNewRoundForDraw(getCurrentChampionshipData());
-        drawService.createDraw(championshipData.getRound(), getWinnersOfRound(championshipData.getRound() - 1));
+        drawFuns.createDraw(championshipData.getRound(), getWinnersOfRound(championshipData.getRound() - 1));
     }
 
     public void redrawCurrentRound() throws NoPlayerFoundException, NoChampionshipFoundException {
@@ -50,9 +57,9 @@ public class ChampionshipService {
         deleteMatchesOfCurrentRound(championshipData);
         Integer currentRound = championshipData.getRound();
         if (currentRound > 1) {
-            drawService.createDraw(championshipData.getRound(), getWinnersOfRound(championshipData.getRound() - 1));
+            drawFuns.createDraw(championshipData.getRound(), getWinnersOfRound(championshipData.getRound() - 1));
         } else {
-            drawService.drawOfNewChampionship(championshipData);
+            drawFuns.drawOfNewChampionship(championshipData);
         }
     }
 
@@ -105,7 +112,7 @@ public class ChampionshipService {
         Optional<Match> noWinnerYet = currentMatchList.stream()
                 .filter(match -> match.getWinner() == null)
                 .findAny();
-        return !noWinnerYet.isPresent();
+        return noWinnerYet.isEmpty();
     }
 
     private void checkMatchResultInput(MatchResultDTO matchResult) throws MissingParameterException, MatchResultException {
@@ -147,18 +154,16 @@ public class ChampionshipService {
 
     public Boolean isOngoingRound() {
         Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
-        if (optionalCSD.isPresent()) {
-            return optionalCSD.get().isOngoingChampionship() && optionalCSD.get().isOngoingRound();
-        }
-        return false;
+        return optionalCSD.filter(championshipData ->
+            championshipData.isOngoingChampionship() && championshipData.isOngoingRound()
+        ).isPresent();
     }
 
     public Boolean isOngoingTeamSelection() {
         Optional<ChampionshipData> optionalCSD = championshipDataRepository.findCurrentChampionshipData();
-        if (optionalCSD.isPresent()) {
-            return optionalCSD.get().isOngoingChampionship() && optionalCSD.get().isOngoingTeamSelection();
-        }
-        return false;
+        return optionalCSD.filter(championshipData ->
+            championshipData.isOngoingChampionship() && championshipData.isOngoingTeamSelection()
+        ).isPresent();
     }
 
     public void startNewChampionship() {
@@ -210,14 +215,14 @@ public class ChampionshipService {
 
     private HashMap<Player, List<Team>> getWinnersOfRound(Integer round) {
         List<Team> teams = matchRepository.findMatchesById_RoundNumber(round)
-                .stream()
-                .map(Match::getWinner)
-                .collect(Collectors.toList());
+            .stream()
+            .map(Match::getWinner)
+            .toList();
 
         HashMap<Player, List<Team>> playerAndTeamsMap = new HashMap<>();
-        teams.forEach(team -> {
-            playerAndTeamsMap.computeIfAbsent(team.getOwner(), k -> new ArrayList<>()).add(team);
-        });
+        teams.forEach(team ->
+            playerAndTeamsMap.computeIfAbsent(team.getOwner(), k -> new ArrayList<>()).add(team)
+        );
         return playerAndTeamsMap;
     }
 

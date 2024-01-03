@@ -1,5 +1,5 @@
 <div th:fragment="header" id="header">
-    <a id="header-logo"><img th:src="@{/img/fifa-logo.png}"></a>
+    <a href="/fifa/championship" id="header-logo"><img th:src="@{/img/fifa-logo.png}"></a>
 
     <div id="menu-icon">
         <a><img th:src="@{/img/menu-icon.png}"></a>
@@ -12,4 +12,8 @@
                 <li><a href="/fifa/championship">Championship</a></li>
             </ul>
     </nav>
+</div>
+
+<div th:fragment="favicon" id="favicon">
+    <link rel="shortcut icon" href="/img/favicon.ico"/>
 </div>

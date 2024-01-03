@@ -11,12 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
 public class PlayerController {
 
-    private PlayerService playerService;
-    private TeamService teamService;
-    private ChampionshipService championshipService;
+    private final PlayerService playerService;
+    private final TeamService teamService;
+    private final ChampionshipService championshipService;
 
     @Autowired
     public PlayerController(PlayerService playerService, TeamService teamService, ChampionshipService championshipService) {
@@ -26,20 +28,22 @@ public class PlayerController {
     }
 
     @GetMapping("/fifa/player")
-    public String playersPage(@RequestParam(required = false) String newNameError, Model model) {
-        model.addAttribute("playerRequest", new PlayerRequestDTO());
+    public String playersPage(@RequestParam(required = false) Boolean newNameError, Model model) {
         if (newNameError != null) {
             model.addAttribute("newNameError", newNameError);
         }
-        model.addAttribute("ongoingTeamSelection", championshipService.isOngoingTeamSelection());
-        model.addAttribute("playerList", playerService.getAllPlayerNames());
+        model.addAllAttributes(Map.of(
+            "ongoingTeamSelection", championshipService.isOngoingTeamSelection(),
+            "playerList", playerService.getAllPlayerNames(),
+            "playerRequest", new PlayerRequestDTO()
+        ));
         return "playersPage";
     }
 
     @PostMapping("/fifa/player/create")
     public String createPlayer(@ModelAttribute PlayerRequestDTO playerRequest) throws PlayerAlreadyExistsException {
         playerService.createPlayer(playerRequest);
-        return "redirect:/fifa/player/";
+        return "redirect:/fifa/player";
     }
 
     @GetMapping("/fifa/player/delete/{playerName}")
@@ -50,10 +54,13 @@ public class PlayerController {
 
     @GetMapping("/fifa/player/{playerName}")
     public String checkPlayer(@PathVariable String playerName, Model model) throws PlayerNameException {
-        model.addAttribute("teamList",
-                teamService.getTeamsByPlayer(playerService.getPlayerByName(playerName)));
-        model.addAttribute("ongoingTeamSelection", championshipService.isOngoingTeamSelection());
-        model.addAttribute("playerName", playerName);
+        model.addAllAttributes(
+            Map.of(
+                "teamList", teamService.getTeamsByPlayer(playerService.getPlayerByName(playerName)),
+                "ongoingTeamSelection", championshipService.isOngoingTeamSelection(),
+                "playerName", playerName
+            )
+        );
         return "player";
     }
 

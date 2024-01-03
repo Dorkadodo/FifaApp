@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 @Controller
 public class ChampionshipController {
 
-    private ChampionshipService championshipService;
-    private static Logger logger = Logger.getLogger("ChampionshipController");
+    private final ChampionshipService championshipService;
+    private static final Logger logger = Logger.getLogger("ChampionshipController");
 
     @Autowired
     public ChampionshipController(ChampionshipService championshipService) {

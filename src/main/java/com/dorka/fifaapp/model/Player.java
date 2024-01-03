@@ -1,11 +1,17 @@
 package com.dorka.fifaapp.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.util.List;
 
 @Getter
@@ -21,7 +27,7 @@ public class Player {
     @Column(unique = true)
     private String name;
 
-    @OneToMany (mappedBy = "owner", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private List<Team> ownTeams;
 
     public Player(String name){

@@ -11,12 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
 public class TeamController {
 
-    private TeamService teamService;
-    private PlayerService playerService;
-    private ChampionshipService championshipService;
+    private final TeamService teamService;
+    private final PlayerService playerService;
+    private final ChampionshipService championshipService;
 
     @Autowired
     public TeamController(TeamService teamService, PlayerService playerService,
@@ -31,12 +33,14 @@ public class TeamController {
         if (invalidNumberError != null) {
             model.addAttribute("invalidNumberError", invalidNumberError);
         }
-        model.addAttribute("teamList", teamService.getAvailableNationalTeams());
-        model.addAttribute("chosenTeams", new ChosenTeamListDTO());
-        model.addAttribute("playerList", playerService.getPlayersWithTeamCount());
-        model.addAttribute("ongoingChampionship", championshipService.isOngoingChampionship());
-        model.addAttribute("ongoingRound", championshipService.isOngoingRound());
-        model.addAttribute("ongoingTeamSelection", championshipService.isOngoingTeamSelection());
+        model.addAllAttributes(Map.of(
+            "teamList", teamService.getAvailableNationalTeams(),
+            "chosenTeams", new ChosenTeamListDTO(),
+            "playerList", playerService.getPlayersWithTeamCount(),
+            "ongoingChampionship", championshipService.isOngoingChampionship(),
+            "ongoingRound", championshipService.isOngoingRound(),
+            "ongoingTeamSelection", championshipService.isOngoingTeamSelection()
+        ));
         return "teamsPage";
     }
 

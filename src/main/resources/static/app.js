@@ -9,3 +9,20 @@ menuIcon.addEventListener("click", () => {
         menuIcon.style.order = "0";
     }
 });
+
+function confirmNewChampionship() {
+    if (confirm("Are you sure you want to close the current Championship and start a new one?")) {
+        fetch('/fifa/championship/new')
+            .then(function(response) {
+                return response.text()
+            })
+            .then(function(html) {
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(function(err) {
+                console.log('Failed to fetch page: ', err);
+            });
+    }
+}

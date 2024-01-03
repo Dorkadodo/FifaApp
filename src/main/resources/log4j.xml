@@ -1,32 +1,25 @@
-<!DOCTYPE log4j:configuration PUBLIC
-        "-//APACHE//DTD LOG4J 1.2//EN"
-        "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
-<log4j:configuration>
-
-    <appender name="fout" class="org.apache.log4j.RollingFileAppender">
-        <param name="file" value="fifa.log"/>
-        <param name="Append" value="true"/>
-        <param name="ImmediateFlush" value="true"/>
-        <param name="MaxFileSize" value="10GB"/>
-        <param name="threshold" value="info"/>
-        <param name="maxBackupIndex" value="1"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss} %5p %c{1} - %m%n"/>
-        </layout>
-    </appender>
-
-    <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
-        <param name="threshold" value="debug"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="%d{yyyy-MM-dd HH:mm:ss} %p %m%n"/>
-        </layout>
-    </appender>
-
-    <root>
-        <level value="DEBUG"/>
-        <appender-ref ref="fout"/>
-        <appender-ref ref="stdout"/>
-    </root>
-
-</log4j:configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <MarkerPatternSelector defaultPattern="%sn. %msg: Logger=%logger%n">
+                    <PatternMatch key="CLASS" pattern="%sn. %msg: Class=%class%n"/>
+                </MarkerPatternSelector>
+            </PatternLayout>
+        </Console>
+        <File name="File" fileName="logs/fifa.log">
+            <PatternLayout>
+                <Pattern>%sn. %msg: Class=%class%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console" />
+        </Root>
+        <Root level="TRACE">
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Fifa Championship</title>
     <link th:href="@{/styles.css}" type="text/css" rel="stylesheet">
+    <div th:replace="fragments :: favicon"/>
 </head>
 
 <body>
@@ -19,6 +20,7 @@
             <a th:if="${ongoingTeamSelection}" href="/fifa/championship/first-draw">START FIRST ROUND</a>
             <a th:if="${ongoingChampionship} and !${ongoingTeamSelection} and !${ongoingRound}" href="/fifa/championship/ongoing-draw">START NEXT ROUND</a>
             <a th:if="${ongoingRound}" href="/fifa/championship/redraw">REDRAW CURRENT ROUND</a>
+            <a th:if="${ongoingRound}" onclick="confirmNewChampionship()">START NEW CHAMPIONSHIP</a>
 
         </div>
 

@@ -3,10 +3,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FifaappApplication {
+public class FifaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FifaappApplication.class, args);
+        SpringApplication.run(FifaApplication.class, args);
     }
 
 }

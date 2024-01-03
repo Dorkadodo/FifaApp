@@ -1,11 +1,13 @@
 package com.dorka.fifaapp.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Getter

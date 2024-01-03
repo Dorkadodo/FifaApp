@@ -3,8 +3,8 @@ package com.dorka.fifaapp.repo;
 import com.dorka.fifaapp.model.Match;
 import com.dorka.fifaapp.model.MatchKey;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
